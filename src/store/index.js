@@ -20,8 +20,9 @@ const store = new Vuex.Store({
         imgUrl: 'http://m.kugou.com/v3/static/images/index/logo_kugou.png',
         title: '',
         singer: '',
-        currentLength: '',
-        songLength: ''
+        currentLength: 0,
+        songLength: 0,
+        currentFlag: false
     },
     listenCount: 0,
     // 播放控件的开关
@@ -70,6 +71,10 @@ const store = new Vuex.Store({
     // 设置当前播放时间
     setAudioTime:(state,time) => {
         state.audio.currentLength = time;
+    },
+    // 设置当前是否是拖拽改变
+    setCurrent: (state,flag)=>{
+        state.audio.currentFlag = flag;
     }
   },
   getters: {

@@ -57,7 +57,13 @@ export default {
      */
     change(){
         let time = document.getElementById("music_audio").currentTime;
-
+        if(this.audio.currentFlag){
+            console.log(this.audio.currentLength);
+            document.getElementById('music_audio').currentTime = this.audio.currentLength;
+            this.$store.commit('setCurrent',false);
+        }else{
+            this.$store.commit('setAudioTime',time);
+        }
     },
     /**
      * 显示audio详情界面

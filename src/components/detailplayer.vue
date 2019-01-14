@@ -4,20 +4,22 @@
         <div :class="$style.detail_player_content">
             <div :class="$style.detail_title">
                 <span @click="hideDetailPlayer" :class="$style.arrowBack"></span>
-                {{audio.title}}
+                <span>{{audio.title}}</span>
             </div>
             <div :class="$style.detail_play_img">
                 <img :src=audio.imgUrl alt="">
             </div>
             <div :class="$style.detail_player_lrc">
-                <p v-for="(item,index) in songLrc" :key="index">
-                    {{item.lrcContent}}
-                </p>
+                <div :class="$style.lrc_content">
+                    <p v-for="(item,index) in songLrc" :key="index">
+                        {{item.lrcContent}}
+                    </p>
+                </div>
             </div>
             <div :class="$style.detail_player_range">
-                <mt-range>
-                    <div slot="start">{{audio.currentLength}}</div>
-                    <div slot="end"></div>
+                <mt-range :min='0' :max=audio.songLength v-model=audio.currentLength :bar-height='3' @touchmove.native='rangeChange' @click.native='clickRangeChange'>
+                    <div slot="start">{{audio.currentLength | time}}</div>
+                    <div slot="end">{{audio.songLength | time}}</div>
                 </mt-range>
             </div>
         </div>
@@ -26,6 +28,20 @@
 <script>
 import {mapGetters} from 'vuex'
 export default {
+    filters: {
+        time(value){
+            var length = Math.floor(parseInt(value));
+            var minite = Math.floor(value / 60);
+            if(minite < 10){
+                minite = '0' + minite;
+            }
+            var second = length % 60;
+            if(second < 10){
+                second = '0' + second;
+            }
+            return minite + ':' + second;
+        }
+    },
     mounted(){
     },
     computed: {
@@ -50,6 +66,13 @@ export default {
         hideDetailPlayer(){
             this.$store.commit('showDetailPlayer',false);
             document.getElementsByTagName('html')[0].style.setProperty('overflow','visible');
+        },
+        rangeChange(e){
+            this.$store.commit('setCurrent',true);
+            this.$store.commit("setAudioTime",this.audio.currentLength);
+        },
+        clickRangeChange(e){
+
         }
     }
 }
@@ -96,6 +119,16 @@ export default {
                 position: absolute;
                 left: 13px;
             }
+            span:nth-of-type(2){
+                width: 80%;
+                position: absolute;
+                display: block;
+                top: 30px;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+                left:41px;
+            }
         }
         .detail_play_img{
             width: 50%;
@@ -108,9 +141,29 @@ export default {
             text-align: center;
             color: #fff;
             margin-bottom: 20px;
+            .lrc_content{
+               transition: all .5s;
+            }
         }
         .detail_player_range{
-            
+            width: 100%;
+            padding:0 10px;
+            color: #fff;
+            font-weight: 900;
         }
     }
 </style>
+
+<style>
+    /*cover defaults style*/
+    .mt-range-content{
+        margin-left: 17px;
+        margin-right: 44px;
+    }
+    .mt-range-thumb{
+        top: 7px;
+        width: 15px;
+        height: 15px;
+    }
+</style>
+
