@@ -1,17 +1,24 @@
 <template>
     <div :class="$style.header_box">
         <header-logo></header-logo>
-        <head-nav></head-nav>
+        <rank-head-nav v-if='rankhead.toggle' :title='rankhead.title'></rank-head-nav>
+        <head-nav v-else></head-nav>
     </div>
 </template>
 
 <script>
 import headerLogo from './headerLogo'
 import headNav from './headNav'
+import rankHeadNav from './rankHeadNav'
+import {mapGetters} from 'vuex'
 export default {
     components: {
         headerLogo,
-        headNav
+        headNav,
+        rankHeadNav
+    },
+    computed: {
+        ...mapGetters(['rankhead'])
     }
 }
 </script>

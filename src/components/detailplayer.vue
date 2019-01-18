@@ -10,8 +10,8 @@
                 <img :src=audio.imgUrl alt="">
             </div>
             <div :class="$style.detail_player_lrc">
-                <div :class="$style.lrc_content">
-                    <p v-for="(item,index) in songLrc" :key="index">
+                <div :class="$style.lrc_content" :style="{marginTop: lrcOffset + 'px'}">
+                    <p v-for="(item,index) in songLrc" :key="index" :class="{isCurrentLrc: item.second > audio.currentLength}">
                         {{item.lrcContent}}
                     </p>
                 </div>
@@ -21,6 +21,11 @@
                     <div slot="start">{{audio.currentLength | time}}</div>
                     <div slot="end">{{audio.songLength | time}}</div>
                 </mt-range>
+            </div>
+            <div :class="$style.detail_player_control">
+                <i :class="[$style.play_prev,$style.player_btn_sm,$style.player_btn]" @click="prev"></i>
+                <i :class="[$style.play_play,$style.player_btn_lg,$style.player_btn,{[$style.play_pause]: isplay}]" @click="toggleStatus"></i>
+                <i :class="[$style.play_next,$style.player_btn_sm,$style.player_btn]" @click="next"></i>
             </div>
         </div>
     </div>
@@ -45,8 +50,8 @@ export default {
     mounted(){
     },
     computed: {
-        ...mapGetters(['detailPlayerFlag','audio']),
-        songLrc(){
+        ...mapGetters(['detailPlayerFlag','audio','isplay']),
+        songLrc(){           
             if(this.audio.lrc){
                 var temp = this.audio.lrc.split('\r\n');
                 temp = temp.map(item => {
@@ -60,6 +65,11 @@ export default {
                 })
                 return temp;
             }
+        },
+        lrcOffset(){
+            if(this.songLrc){
+                return (this.songLrc.length - document.getElementsByClassName('isCurrentLrc').length) * (-20) + this.audio.currentLength - this.audio.currentLength;
+            }
         }
     },
     methods:{
@@ -72,7 +82,34 @@ export default {
             this.$store.commit("setAudioTime",this.audio.currentLength);
         },
         clickRangeChange(e){
-
+            if(e.target.className === 'mt-range-content' || e.target.className === 'mt-range-runway' || e.target.className === 'mt-range-progress'){
+                var offset = e.offsetX;
+                var rangeWidth = document.getElementsByClassName('mt-range-content')[0].offsetWidth;
+                var clickLength = Math.floor(offset * this.audio.songLength / rangeWidth);
+                if(offset < rangeWidth){
+                    this.$store.commit('setAudioTime',clickLength);
+                    this.$store.commit('setCurrent',true);
+                }
+            }else{
+                return false;
+            }
+        },
+        next(){
+            this.$store.dispatch('next');
+        },
+        prev(){
+            this.$store.dispatch('prev');
+        },
+        /**
+         * 切换播放状态
+         */
+        toggleStatus(){
+            this.$store.commit('toggleIsPlay',!this.isplay);
+            if(this.isplay){
+                document.getElementById('music_audio').play();
+            }else{
+                document.getElementById('music_audio').pause();
+            }
         }
     }
 }
@@ -141,8 +178,12 @@ export default {
             text-align: center;
             color: #fff;
             margin-bottom: 20px;
+            line-height: 20px;
             .lrc_content{
                transition: all .5s;
+               .isCurrentLrc{
+                   color: orange;
+               }
             }
         }
         .detail_player_range{
@@ -151,14 +192,45 @@ export default {
             color: #fff;
             font-weight: 900;
         }
+        .detail_player_control{
+            margin-top: 10px;
+            display: flex;
+            padding: 0 20%;
+            .player_btn_sm{
+
+            }
+            .player_btn_lg{
+
+            }
+            .player_btn{
+                width: 33.3%;
+                height: 100px;
+                display: block;
+            }
+            .play_prev{
+                background: url(../assets/images/play_prev.png) no-repeat center/60%;
+            }
+            .play_play{
+                background: url(../assets/images/play_play.png) no-repeat center/90%;
+            }
+            .play_next{
+                background: url(../assets/images/play_next.png) no-repeat center/60%;
+            }
+            .play_pause{
+                background: url(../assets/images/play_pause.png) no-repeat center/90%;
+            }
+        }
     }
 </style>
 
 <style>
     /*cover defaults style*/
     .mt-range-content{
-        margin-left: 17px;
-        margin-right: 44px;
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+    .mt-range-runway{
+        right: -1px;
     }
     .mt-range-thumb{
         top: 7px;

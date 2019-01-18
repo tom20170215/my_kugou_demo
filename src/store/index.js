@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import * as api from '../axios/getData'
-import axios from 'axios'
 
 Vue.use(Vuex);
 
@@ -23,6 +22,10 @@ const store = new Vuex.Store({
         currentLength: 0,
         songLength: 0,
         currentFlag: false
+    },
+    rankhead: {
+        toggle: false,
+        title: ''
     },
     listenCount: 0,
     // 播放控件的开关
@@ -75,6 +78,14 @@ const store = new Vuex.Store({
     // 设置当前是否是拖拽改变
     setCurrent: (state,flag)=>{
         state.audio.currentFlag = flag;
+    },
+    // 设置导航栏显示状态
+    showRankNav: (state,flag)=>{
+        state.rankhead.toggle = flag;
+    },
+    // 设置排名的标题
+    setRankTitle:(state,title) => {
+        state.rankhead.title = title;
     }
   },
   getters: {
@@ -83,7 +94,8 @@ const store = new Vuex.Store({
     showPlayer: state => state.showPlayer,
     audioLoadding: state => state.audioLoadding,
     isplay: state => state.isplay,
-    detailPlayerFlag: state => state.detailPlayerFlag
+    detailPlayerFlag: state => state.detailPlayerFlag,
+    rankhead: state => state.rankhead
   },
   actions: {
     /**
@@ -111,23 +123,38 @@ const store = new Vuex.Store({
         if(state.isplay){
             commit('toggleIsPlay',!state.isplay);
         }
-        return new Promise((resolve,reject) => {
-            api.getSong(params).then(res => {
-                let data = res.data.data;
-                let songUrl = data.play_url;
-                let imgUrl = data.img;
-                let title = data.audio_name;
-                let singer = data.author_name;
-                let songLength = data.timelength / 1000;
-                let lyrics = data.lyrics;
-                let currentLength = 0;
-                let audio = {songUrl,imgUrl,title,singer,songLength,currentLength};
-                commit('setAudio',audio);
-                commit('setLrc',lyrics);
-                commit('toggleAudioLoading',false);
-                commit('toggleIsPlay',true);
-            })
+        api.getSong(params).then(res => {
+            let data = res.data.data;
+            let songUrl = data.play_url;
+            let imgUrl = data.img;
+            let title = data.audio_name;
+            let singer = data.author_name;
+            let songLength = data.timelength / 1000;
+            let lyrics = data.lyrics;
+            let currentLength = 0;
+            let audio = {songUrl,imgUrl,title,singer,songLength,currentLength};
+            commit('setAudio',audio);
+            commit('setLrc',lyrics);
+            commit('toggleAudioLoading',false);
+            commit('toggleIsPlay',true);
         });
+        // return new Promise((resolve,reject) => {
+        //     api.getSong(params).then(res => {
+        //         let data = res.data.data;
+        //         let songUrl = data.play_url;
+        //         let imgUrl = data.img;
+        //         let title = data.audio_name;
+        //         let singer = data.author_name;
+        //         let songLength = data.timelength / 1000;
+        //         let lyrics = data.lyrics;
+        //         let currentLength = 0;
+        //         let audio = {songUrl,imgUrl,title,singer,songLength,currentLength};
+        //         commit('setAudio',audio);
+        //         commit('setLrc',lyrics);
+        //         commit('toggleAudioLoading',false);
+        //         commit('toggleIsPlay',true);
+        //     })
+        // });
     },
     /**
      *获取排行列表
@@ -137,6 +164,18 @@ const store = new Vuex.Store({
     getRank({state,commit},params){
         return new Promise((resolve,reject) => {
             api.getRank(params).then(res => {
+                resolve(res.data);
+            })
+        })
+    },
+    /**
+     * 获取排行内容
+     * @param {*} param0 
+     * @param {*} params 
+     */
+    getRankInfo({state,commit},params){
+        return new Promise((resolve,reject) => {
+            api.getRankInfo(params).then(res => {
                 resolve(res.data);
             })
         })
@@ -156,6 +195,23 @@ const store = new Vuex.Store({
         dispatch('getSong',{
             r: 'play/getdata',
             hash:hash
+        });
+    },
+    /**
+     * 切换到上一首
+     * @param {*} param0 
+     */
+    prev({dispatch,state}){
+        let list = state.listInfo.songList;
+        if(state.listInfo.songIndex == 0){
+            state.listInfo.songIndex = list.length -1;
+        }else{
+            state.listInfo.songIndex--
+        }
+        var hash = list[state.listInfo.songIndex].hash;
+        dispatch('getSong',{
+            r: 'play/getdata',
+            hash: hash
         });
     }
   }

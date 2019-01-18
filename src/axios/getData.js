@@ -17,9 +17,15 @@ var getSong = params => getInfo('/bproxy/yy/index.php',params,'GET');
  */
 var getRank = params => getInfo('/api/rank/list',params,'GET');
 
+/**
+ * 获取排行内容
+ * @param {*} params 
+ */
+var getRankInfo = params => getInfo(`/api/rank/info`,params,'GET');
 
 export {
     getBanner,
     getSong,
-    getRank
+    getRank,
+    getRankInfo
 }

@@ -21,7 +21,7 @@ export default new Router({
       component: rank
     },
     {
-      path: 'rank/info/:id',
+      path: '/rank/info/:id',
       name: 'rankInfo',
       component: rankInfo
     }
