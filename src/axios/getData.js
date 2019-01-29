@@ -23,9 +23,23 @@ var getRank = params => getInfo('/api/rank/list',params,'GET');
  */
 var getRankInfo = params => getInfo(`/api/rank/info`,params,'GET');
 
+/**
+ * 获取歌单列表
+ * @param {*} params 
+ */
+var getpList = params => getInfo(`/api/plist/index`,params,'GET');
+
+/**
+ * 获取歌单内容
+ * @param {*} params 
+ */
+var getpInfo = params => getInfo(`/api/plist/list/${params.id}`,params.data,'GET');
+
 export {
     getBanner,
     getSong,
     getRank,
-    getRankInfo
+    getRankInfo,
+    getpList,
+    getpInfo
 }

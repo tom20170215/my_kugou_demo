@@ -1,7 +1,7 @@
 <template>
-    <div :class="$style.rank_head_nav">
-        <a href="" :class="$style.back_arrow"></a>
-        <p>{{title}}</p>
+    <div :class="$style.rank_head_nav" id="transparent-header">
+        <a :class="$style.back_arrow" @click="goBack"></a>
+        <p :class="$style.rank_title">{{title}}</p>
     </div>
 </template>
 
@@ -12,14 +12,21 @@ export default {
             type: String,
             default: ''
         }
+    },
+    methods:{
+        goBack(){
+            this.$router.go(-1);
+        }
     }
 }
 </script>
 
 <style lang="scss" module>
     .back_arrow{
-        background: url(../../assets/images/goback_icon.png) no-repeat center/100%;
+        background: url(../../assets/images/goback_icon.png) no-repeat center/60%;
         display: block;
+        width: 24px;
+        height: 100%;
     }
     .rank_head_nav{
         position: fixed;
@@ -31,5 +38,15 @@ export default {
         text-align: center;
         z-index: 999;
         font-weight: 900;
+        display: flex;
+        align-items: center;
+        background: rgba( 43,162,251,0);
+        .back_arrow{
+            margin-left: 10px;
+            margin-right: 105px;
+        }
+        .rank_title{
+
+        }
     }
 </style>

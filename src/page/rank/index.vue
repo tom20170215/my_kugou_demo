@@ -64,5 +64,8 @@ export default {
   background-image: none;
   border-bottom: 1px solid #e8e8e8;
 }
+.mint-cell-title img{
+    margin-right: 10px;
+}
 </style>
 

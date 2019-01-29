@@ -213,6 +213,30 @@ const store = new Vuex.Store({
             r: 'play/getdata',
             hash: hash
         });
+    },
+    /**
+     * 获取歌单列表
+     * @param {*} param0 
+     */
+    getpList({state},params){
+        return new Promise((resolve,reject) => {
+            api.getpList(params).then(res => {
+                resolve(res.data);
+            })
+        })
+    },
+    
+    /**
+     * 获取歌单内容
+     * @param {*} param0 
+     * @param {*} params 
+     */
+    getpInfo({state},params){
+        return new Promise((resolve,reject) => {
+            api.getpInfo(params).then(res => {
+                resolve(res.data)
+            })
+        });
     }
   }
 });
